@@ -315,6 +315,10 @@
         color: var(--muted);
         display: block;
       }
+      .latest li span.empty {
+        white-space: normal;
+        min-width: 0;
+      }
       form {
         background: var(--panel);
         border: 1px solid var(--line);
@@ -661,51 +665,144 @@
         margin-top: 12px;
       }
 
-      /* ---- the film: a portal you scroll through (after violoop.ai's black-hole section) ---- */
-      #film { position: relative; height: 320vh; }
-      #film .stage { position: sticky; top: 0; height: 100vh; overflow: hidden; background: #07060e; }
-      #film canvas.bh { position: absolute; inset: 0; width: 100%; height: 100%; }
+      /* ---- first screen: a black hole you scroll through into the film (after violoop.ai) ---- */
+      #film { position: relative; height: 420vh; padding: 0; }
+      #film .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #050409; }
+      #film canvas.bh { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 2.4s ease 0.4s; }
+      #film.lit canvas.bh { opacity: 1; }
       #film .bh-css { position: absolute; inset: 0; display: none;
         background: radial-gradient(circle at 50% 50%, #000 0 14%, rgba(255,178,36,.75) 15%, rgba(142,123,224,.35) 22%, rgba(7,6,14,0) 42%); }
-      #film .egg { position: absolute; left: 50%; top: 50%; width: min(34vw, 460px); aspect-ratio: 1 / 1;
+      #film .bar { position: absolute; left: 0; right: 0; top: 0; z-index: 6; display: flex; justify-content: space-between; align-items: center;
+        padding: 20px 28px; font-size: 13px; letter-spacing: .28em; color: rgba(244,236,221,.7); opacity: 0; transition: opacity 1.2s ease 3.2s; }
+      #film.lit .bar { opacity: 1; }
+      #film .bar a { color: var(--amber); text-decoration: none; letter-spacing: .12em; font-size: 14px; border: 1px solid rgba(255,178,36,.5); padding: 8px 14px; border-radius: 999px; }
+      #film .egg { position: absolute; left: 50%; top: 52%; width: min(34vw, 460px); aspect-ratio: 1 / 1;
+        transform: translate(-50%, -50%); will-change: transform, opacity, filter; }
+      #film .egg-in { position: absolute; inset: 0; animation: drift 6s ease-in-out infinite;
         background: url(./assets/plates/hero_base.jpg) 50% 61% / 340% auto no-repeat;
         -webkit-mask: radial-gradient(closest-side, #000 62%, transparent 100%); mask: radial-gradient(closest-side, #000 62%, transparent 100%);
-        transform: translate(-50%, -50%); will-change: transform, opacity, filter; }
-      #film .egg-in { position: absolute; inset: 0; animation: drift 6s ease-in-out infinite; }
+        filter: brightness(0) contrast(1.2); transition: filter 2.6s ease 1.6s; }
+      #film.lit .egg-in { filter: brightness(1) contrast(1); }
       @keyframes drift { 0%, 100% { transform: translateY(-1.2%); } 50% { transform: translateY(1.2%); } }
       #film .tag { position: absolute; max-width: 260px; opacity: 0; transform: translateY(8px); }
       #film .tag b { display: block; font-family: var(--f-text); font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--cream); }
-      #film .tag span { display: block; margin-top: 4px; font-size: 13px; line-height: 1.4; color: var(--muted); }
-      #film .tag i { display: inline-block; padding: 8px 12px; border-radius: 6px; background: rgba(12,10,22,.66); backdrop-filter: blur(3px); font-style: normal; }
-      #film .kicker { position: absolute; left: 24px; bottom: 20px; font-size: 12px; letter-spacing: .3em; color: rgba(143,136,168,.75); }
-      #film .head { position: absolute; left: 0; right: 0; top: 9vh; text-align: center; pointer-events: none; }
-      #film .head h2 { font-size: clamp(36px, 4.6vw, 76px); color: var(--cream); }
-      #film .head p { margin-top: 12px; color: var(--muted); font-size: 18px; letter-spacing: .08em; }
-      #film video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000;
-        clip-path: circle(0% at 50% 50%); }
-      #film .play { position: absolute; left: 50%; top: 50%; z-index: 5; width: 72px; height: 72px; margin: -36px 0 0 -36px;
+      #film .tag span { display: block; margin-top: 4px; font-size: 13px; line-height: 1.4; color: rgba(244,236,221,.7); }
+      #film .tag i { display: inline-block; padding: 8px 12px; border-radius: 6px; background: rgba(12,10,22,.7); backdrop-filter: blur(3px); font-style: normal; }
+      #film .head { position: absolute; left: 0; right: 0; top: 12vh; text-align: center; pointer-events: none; padding: 0 20px; }
+      #film .head .t { font-size: clamp(34px, 5vw, 84px); color: var(--cream); }
+      #film .head .t span { display: inline-block; opacity: 0; filter: blur(14px); transform: translateY(14px); transition: opacity 1.4s ease, filter 1.6s ease, transform 1.6s ease; }
+      #film.lit .head .t span { opacity: 1; filter: blur(0); transform: none; }
+      #film .head p { margin-top: 14px; color: rgba(244,236,221,.6); font-size: 15px; letter-spacing: .32em; opacity: 0; transition: opacity 1.2s ease 4.2s; }
+      #film.lit .head p { opacity: 1; animation: breathe 2.8s ease-in-out 5.4s infinite; }
+      @keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+      #film .px { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; background: var(--amber);
+        box-shadow: 0 0 26px 6px rgba(255,178,36,.55); opacity: 0; }
+      #film .whisper { position: absolute; left: 0; right: 0; top: calc(50% + 34px); text-align: center; font-size: 15px; letter-spacing: .4em; color: rgba(244,236,221,.75); white-space: nowrap; }
+      #film video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; opacity: 0;
+        -webkit-mask: radial-gradient(circle at 50% 50%, #000 var(--r, 0%), transparent calc(var(--r, 0%) + 18%)); mask: radial-gradient(circle at 50% 50%, #000 var(--r, 0%), transparent calc(var(--r, 0%) + 18%)); }
+      #film .play { position: absolute; left: 50%; top: 52%; z-index: 5; width: 72px; height: 72px; margin: -36px 0 0 -36px;
         display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer;
         border: 1.5px solid rgba(255,178,36,.75); background: rgba(12,10,22,.55); color: var(--amber);
-        box-shadow: 0 0 32px rgba(255,178,36,.3); backdrop-filter: blur(8px);
+        box-shadow: 0 0 32px rgba(255,178,36,.3); backdrop-filter: blur(8px); opacity: 0;
         transition: transform .3s, background-color .3s, color .3s; }
       #film .play:hover { transform: scale(1.06); background: var(--amber); color: var(--ink); }
       #film .play::before { content: ""; margin-left: 4px; border-style: solid; border-width: 11px 0 11px 17px; border-color: transparent transparent transparent currentColor; }
       #film .play span { position: absolute; top: 86px; white-space: nowrap; font-size: 12px; letter-spacing: .28em; color: rgba(255,178,36,.85); }
-      #film .sound { position: absolute; right: 28px; bottom: 28px; z-index: 6; opacity: 0; pointer-events: none;
+      #film .sound { position: absolute; right: 24px; bottom: 24px; z-index: 6; opacity: 0; pointer-events: none;
         font-family: var(--f-text); font-size: 16px; padding: 12px 20px; border-radius: 999px; cursor: pointer;
         border: 1.5px solid var(--amber); background: rgba(12,10,22,.7); color: var(--amber); transition: opacity .4s; }
       #film .sound.on { opacity: 1; pointer-events: auto; }
-      .hero .watch { margin-left: 18px; color: var(--cream); font-size: 18px; text-decoration: none; border-bottom: 1px solid rgba(244,236,221,.4); }
+      #film .kicker { display: none; }
+      @media (max-width: 760px) {
+        #film { height: 380vh; }
+        #film .bar { padding: 14px 16px; font-size: 11px; letter-spacing: .2em; }
+        #film .bar a { font-size: 12px; padding: 7px 11px; }
+        #film .head { top: 13vh; }
+        #film .egg { width: min(70vw, 360px); top: 54%; }
+        #film .play { top: 54%; }
+        #film .tag { display: none; }
+        #film video { object-fit: contain; }
+        #film .whisper { font-size: 12px; letter-spacing: .3em; }
+        #film .sound { left: 16px; right: 16px; bottom: 16px; }
+      }
       @media (prefers-reduced-motion: reduce) {
         #film { height: auto; }
         #film .stage { position: relative; height: auto; aspect-ratio: 16 / 9; }
-        #film canvas.bh, #film .egg, #film .tag, #film .head, #film .play, #film .kicker { display: none; }
-        #film video { position: relative; clip-path: none; }
+        #film canvas.bh, #film .egg, #film .tag, #film .head, #film .play, #film .kicker, #film .px, #film .whisper { display: none; }
+        #film video { position: relative; opacity: 1; -webkit-mask: none; mask: none; }
+      }
+
+      /* ---- phones and narrow windows ---- */
+      @media (max-width: 900px) {
+        body { font-size: 17px; }
+        .wrap { padding: 0 20px; }
+        .hero { grid-template-columns: minmax(0, 1fr); min-height: 0; padding-top: 64px; padding-bottom: 24px; row-gap: 40px; }
+        .hero h1 { font-size: clamp(46px, 14vw, 88px); }
+        .hero .sub { font-size: clamp(22px, 6vw, 30px); }
+        .offer { margin-top: 36px; }
+        .offer .deal { white-space: normal; font-size: clamp(34px, 9.5vw, 52px); }
+        .offer .clock b { font-size: 32px; min-width: 0; }
+        .hero .watch { display: block; margin: 18px 0 0; width: max-content; }
+        .device { zoom: var(--z, 1); justify-self: center; }
+        .btn { font-size: 20px; padding: 16px 26px; }
+        section { padding-top: 64px; }
+        section h2 { font-size: clamp(30px, 8.5vw, 44px); }
+        .round { grid-template-columns: minmax(0, 1fr); row-gap: 32px; margin-top: 28px; }
+        .cap { grid-template-columns: repeat(10, 1fr); gap: 5px; }
+        .tally { flex-wrap: wrap; gap: 12px; }
+        .tally .sum { font-size: clamp(34px, 10vw, 52px); }
+        .tally .of { white-space: normal; font-size: 16px; }
+        .tally canvas { width: 180px; height: 135px; margin: 0; }
+        form { padding: 22px; }
+        .shares label b { font-size: 24px; }
+        .chart { margin-top: 44px; }
+        .chart h3 { font-size: 22px; }
+        .split { height: 56px; }
+        .keys { flex-direction: column; gap: 16px; }
+        .keys > div { flex: none !important; padding-right: 0; }
+        .keys b { font-size: 26px; white-space: normal; }
+        .keys span { font-size: 16px; }
+        .two { grid-template-columns: minmax(0, 1fr); }
+        .market { grid-template-columns: minmax(0, 1fr); row-gap: 24px; }
+        .rows b { font-size: 26px; white-space: normal; }
+        .plan { height: 220px; column-gap: 12px; padding: 0; }
+        .plan .val { font-size: 20px; }
+        .plan .rev { font-size: 14px; white-space: normal; text-align: center; }
+        .plan .bar { width: 56px; }
+        .years { column-gap: 12px; padding: 10px 0 0; font-size: 14px; }
+        .funds div { grid-template-columns: minmax(0, 1fr); row-gap: 6px; }
+        .funds b { font-size: 28px; white-space: normal; }
+        #beer .beer { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 24px; justify-items: start; }
+        #beer .beer-qr { width: 220px; height: 220px; }
+        footer { flex-direction: column; gap: 16px; margin-top: 64px; }
+        #tip { display: none; }
       }
     </style>
   </head>
   <body>
     <div id="tip" role="tooltip"></div>
+
+    <section id="film" aria-label="Тамагент: первый экран и фильм">
+      <div class="stage">
+        <canvas class="bh" aria-hidden="true"></canvas>
+        <div class="bh-css" aria-hidden="true"></div>
+        <div class="bar"><span>ТАМАГЕНТ</span><a href="#round">1% за 5 млн руб. →</a></div>
+        <div class="head"><div class="t d" role="heading" aria-level="2"><span>Он</span> <span>уже</span> <span>рядом</span></div><p>листайте вниз</p></div>
+        <div class="egg" aria-hidden="true"><div class="egg-in"></div></div>
+        <div class="tag" style="left:7%;top:26%"><i><b>Голос в обе стороны</b><span>Спрашивает вслух, вы отвечаете вслух.</span></i></div>
+        <div class="tag" style="right:6%;top:24%;text-align:right"><i><b>Любой агент</b><span>Claude Code, Codex, OpenCode и другие.</span></i></div>
+        <div class="tag" style="left:9%;top:72%"><i><b>Зовёт, когда нужен</b><span>Светом, звуком и голосом.</span></i></div>
+        <div class="tag" style="right:7%;top:74%;text-align:right"><i><b>Растёт на задачах</b><span>Персонаж, о котором не забывают.</span></i></div>
+        <div class="px" aria-hidden="true"></div>
+        <div class="whisper" aria-hidden="true"></div>
+        <video preload="metadata" playsinline muted loop poster="./assets/film/tamagent-film-poster.jpg">
+          <source src="./assets/film/tamagent-preview.mp4" type="video/mp4" />
+        </video>
+        <button class="play" type="button" aria-label="Смотреть фильм со звуком"><span>СМОТРЕТЬ</span></button>
+        <button class="sound" type="button">Смотреть со звуком</button>
+        <span class="kicker">// ПО ТУ СТОРОНУ</span>
+      </div>
+    </section>
 
     <header class="wrap hero">
       <div>
@@ -723,7 +820,7 @@
             ><b id="clock">--:--:--</b>
           </div>
           <a class="btn" href="#round">Выбрать долю</a>
-          <a class="watch" href="#film">Сначала фильм ↓</a>
+          <a class="watch" href="#film">Посмотреть фильм ↑</a>
         </div>
       </div>
       <figure class="device" id="device">
@@ -751,24 +848,6 @@
       </figure>
     </header>
 
-    <section id="film" aria-label="Фильм о Тамагенте">
-      <div class="stage">
-        <canvas class="bh" aria-hidden="true"></canvas>
-        <div class="bh-css" aria-hidden="true"></div>
-        <div class="head"><h2>Он уже рядом</h2><p>листайте вниз</p></div>
-        <div class="egg" aria-hidden="true"><div class="egg-in"></div></div>
-        <div class="tag" style="left:7%;top:24%"><i><b>Голос в обе стороны</b><span>Спрашивает вслух, вы отвечаете вслух.</span></i></div>
-        <div class="tag" style="right:6%;top:22%;text-align:right"><i><b>Любой агент</b><span>Claude Code, Codex, OpenCode и другие.</span></i></div>
-        <div class="tag" style="left:9%;top:70%"><i><b>Зовёт, когда нужен</b><span>Светом, звуком и голосом.</span></i></div>
-        <div class="tag" style="right:7%;top:72%;text-align:right"><i><b>Растёт на задачах</b><span>Персонаж, о котором не забывают.</span></i></div>
-        <video preload="metadata" playsinline muted loop poster="./assets/film/tamagent-film-poster.jpg">
-          <source src="./assets/film/tamagent-film-web.mp4#t=34" type="video/mp4" />
-        </video>
-        <button class="play" type="button" aria-label="Смотреть фильм со звуком"><span>СМОТРЕТЬ</span></button>
-        <button class="sound" type="button">Смотреть со звуком</button>
-        <span class="kicker">// ПО ТУ СТОРОНУ</span>
-      </div>
-    </section>
 
     <main class="wrap">
       <section id="round">
@@ -1222,6 +1301,8 @@
             im.style.display = "none";
           });
         });
+        const fitDevice = () => { const w = box.parentElement.clientWidth; box.style.setProperty("--z", Math.min(1, w / 560).toFixed(3)); };
+        addEventListener("resize", fitDevice); fitDevice();
         const scr = $("screen");
         scr.style.left = (s0.x - ox) * k + "px";
         scr.style.top = (s0.y - oy) * k + "px";
@@ -1324,42 +1405,41 @@
       })();
     </script>
     <script>
-      /* ---- the film portal: scroll drives a black hole that swallows the device and opens into the film ---- */
+      /* ---- first screen: the device in front of a black hole; scrolling drops it in and the film opens on the other side ---- */
       (function () {
         const sec = document.getElementById("film"); if (!sec) return;
         const cv = sec.querySelector("canvas.bh"), egg = sec.querySelector(".egg"), vid = sec.querySelector("video");
         const tags = [...sec.querySelectorAll(".tag")], head = sec.querySelector(".head"), play = sec.querySelector(".play"), sound = sec.querySelector(".sound");
+        const px = sec.querySelector(".px"), whisper = sec.querySelector(".whisper"), bar = sec.querySelector(".bar");
         const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
         const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), seg = (x, a, b) => clamp((x - a) / (b - a), 0, 1), ease = (x) => x * x * (3 - 2 * x);
-        if (reduce) { vid.controls = true; vid.muted = false; vid.loop = false; return; }
+        if (reduce) { vid.controls = true; vid.muted = false; vid.loop = false; vid.style.opacity = 1; return; }
+        requestAnimationFrame(() => setTimeout(() => sec.classList.add("lit"), 250)); // darkness first, then the disk ignites, then the device
 
-        let gl = null, uni = {}, t0 = performance.now(), p = 0, rsNow = 0.12;
+        let gl = null, uni = {}, t0 = performance.now();
         try { gl = cv.getContext("webgl", { antialias: false, premultipliedAlpha: false }); } catch (e) { gl = null; }
         if (gl) {
           const vs = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
           const fs = `precision mediump float;
-            uniform vec2 u_res; uniform float u_time; uniform float u_rs;
+            uniform vec2 u_res; uniform float u_time; uniform float u_rs; uniform float u_glow;
             float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
             float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
             float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*noise(p);p*=2.03;a*=.5;}return v;}
             void main(){
-              vec2 uv=(gl_FragCoord.xy-.5*u_res)/u_res.y; float r=length(uv), ang=atan(uv.y,uv.x);
-              float rs=u_rs;
-              // gravitational lens: pull the background inwards near the horizon
+              vec2 uv=(gl_FragCoord.xy-.5*u_res)/min(u_res.x,u_res.y); float r=length(uv), ang=atan(uv.y,uv.x);
+              float rs=u_rs, dr=r/rs;
               vec2 luv=uv*(1.+rs*rs/max(r*r,1e-4)*.35);
-              // tilted accretion disk, as a band around the horizon with streaks that orbit
-              float dr=r/rs; float band=smoothstep(1.05,1.35,dr)*(1.-smoothstep(1.6,3.2,dr));
-              vec2 ring2=vec2(cos(ang-u_time*.35),sin(ang-u_time*.35))*2.6; // periodic in the angle: no seam on the left
+              float band=smoothstep(1.05,1.35,dr)*(1.-smoothstep(1.6,3.2,dr));
+              vec2 ring2=vec2(cos(ang-u_time*.35),sin(ang-u_time*.35))*2.6;
               float streaks=fbm(vec2(dr*9.-u_time*.7,0.)+ring2);
               float doppler=1.+.9*clamp(-sin(ang+.6),0.,1.);
-              float disk=band*(.3+1.15*streaks)*doppler;
-              float ring=exp(-abs(dr-1.18)*28.)*1.5;
+              float disk=band*(.3+1.15*streaks)*doppler*u_glow;
+              float ring=exp(-abs(dr-1.18)*28.)*1.5*(.25+.75*u_glow);
               vec2 sp=floor(luv*150.); float star=step(.9975,hash(sp))*(.4+.6*noise(vec2(u_time*.7)+sp));
               vec3 amber=vec3(1.,.70,.14), violet=vec3(.55,.48,.88), hot=vec3(1.,.95,.86);
               vec3 col=disk*mix(violet,amber,clamp(streaks*1.3-.1,0.,1.));
-              col+=ring*mix(amber,hot,.5); col+=star*vec3(.9,.86,1.)*.8;
-              col+=vec3(.03,.025,.06)*(1.-smoothstep(0.,1.2,r));
-              col*=smoothstep(.98,1.02,dr); // the horizon itself is black
+              col+=ring*mix(amber,hot,.5); col+=star*vec3(.9,.86,1.)*.75;
+              col*=smoothstep(.98,1.02,dr);
               gl_FragColor=vec4(col,1.);
             }`;
           const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
@@ -1367,51 +1447,59 @@
             const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pr); gl.useProgram(pr);
             const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
             const loc = gl.getAttribLocation(pr, "a"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-            uni = { res: gl.getUniformLocation(pr, "u_res"), time: gl.getUniformLocation(pr, "u_time"), rs: gl.getUniformLocation(pr, "u_rs") };
+            uni = { res: gl.getUniformLocation(pr, "u_res"), time: gl.getUniformLocation(pr, "u_time"), rs: gl.getUniformLocation(pr, "u_rs"), glow: gl.getUniformLocation(pr, "u_glow") };
           } catch (e) { gl = null; }
         }
         if (!gl) { cv.style.display = "none"; sec.querySelector(".bh-css").style.display = "block"; }
 
         function size() { const k = Math.min(devicePixelRatio || 1, 1.5); cv.width = Math.round(cv.clientWidth * k); cv.height = Math.round(cv.clientHeight * k); if (gl) gl.viewport(0, 0, cv.width, cv.height); }
         addEventListener("resize", size); size();
-
-        function progress() { const r = sec.getBoundingClientRect(), span = sec.offsetHeight - innerHeight; return clamp(-r.top / span, 0, 1); }
-        let wantPlay = false;
+        const progress = () => { const r = sec.getBoundingClientRect(), span = sec.offsetHeight - innerHeight; return clamp(-r.top / span, 0, 1); };
+        const LINE = "по ту сторону";
+        let wantPlay = false, ignite = 0;
         function frame(now) {
-          p = progress();
-          // horizon radius (in units of the viewport height): grows, then swallows the screen
-          const grow = ease(seg(p, 0.12, 0.55)), swallow = ease(seg(p, 0.5, 0.86));
-          rsNow = 0.13 + 0.22 * grow + 1.9 * swallow;
-          if (gl) { gl.uniform2f(uni.res, cv.width, cv.height); gl.uniform1f(uni.time, (now - t0) / 1000); gl.uniform1f(uni.rs, rsNow); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); }
-          // the device falls into the hole: towards the centre, smaller, slightly turned and blurred
-          const fall = ease(seg(p, 0.18, 0.56));
-          egg.style.opacity = 1 - seg(p, 0.46, 0.56);
-          egg.style.transform = `translate(-50%, -50%) scale(${1 - 0.92 * fall}) rotate(${-14 * fall}deg)`;
-          egg.style.filter = `blur(${6 * fall}px) brightness(${1 - 0.5 * fall})`;
-          tags.forEach((el, i) => { const a = ease(seg(p, 0.02 + i * 0.03, 0.08 + i * 0.03)) * (1 - seg(p, 0.3, 0.4)); el.style.opacity = a; el.style.transform = `translateY(${(1 - a) * 8}px)`; });
-          head.style.opacity = 1 - seg(p, 0.2, 0.32);
-          // out the other side: the film opens through the horizon, which then fills the screen
-          const vmin = Math.min(innerWidth, innerHeight), diag = Math.hypot(innerWidth, innerHeight) / 2;
-          const rpx = rsNow * innerHeight * 0.98, pct = clamp(rpx / diag * 70.71, 0, 72);
-          vid.style.clipPath = p < 0.5 ? "circle(0% at 50% 50%)" : `circle(${p > 0.86 ? 75 : pct}% at 50% 50%)`;
-          const inFilm = p > 0.5;
-          if (inFilm && !wantPlay) { wantPlay = true; if (vid.muted && vid.currentTime < 1) { try { vid.currentTime = 34; } catch (e) {} } const pr = vid.play(); if (pr && pr.catch) pr.catch(() => {}); }
+          const p = progress(), time = (now - t0) / 1000;
+          ignite = ease(clamp((time - 0.6) / 2.6, 0, 1)); // the disk lights up slowly after load
+          // horizon radius, in units of the shorter side of the screen
+          const grow = ease(seg(p, 0.1, 0.45)), swallow = ease(seg(p, 0.42, 0.6));
+          const rs = 0.14 + 0.2 * grow + 2.6 * swallow;
+          if (gl) { gl.uniform2f(uni.res, cv.width, cv.height); gl.uniform1f(uni.time, time); gl.uniform1f(uni.rs, rs); gl.uniform1f(uni.glow, ignite); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); }
+          // the device falls in: smaller, turning, dimming, blurring
+          const fall = ease(seg(p, 0.16, 0.46));
+          egg.style.opacity = 1 - seg(p, 0.4, 0.47);
+          egg.style.transform = `translate(-50%, -50%) scale(${1 - 0.93 * fall}) rotate(${-16 * fall}deg)`;
+          egg.style.filter = fall > 0 ? `blur(${7 * fall}px) brightness(${1 - 0.6 * fall})` : "";
+          tags.forEach((el, i) => { const a = ease(seg(p, 0.03 + i * 0.025, 0.08 + i * 0.025)) * (1 - seg(p, 0.26, 0.34)); el.style.opacity = a; el.style.transform = `translateY(${(1 - a) * 8}px)`; });
+          head.style.opacity = 1 - seg(p, 0.12, 0.24);
+          bar.style.visibility = p > 0.55 ? "hidden" : "visible";
+          // the other side: total darkness, one amber pixel, a whisper; then the film surfaces from the black
+          const dark = seg(p, 0.58, 0.62), emerge = ease(seg(p, 0.7, 0.92));
+          const beat = 0.55 + 0.45 * Math.sin(time * 4.2);
+          px.style.opacity = dark * (1 - seg(p, 0.7, 0.76)) * beat;
+          const typed = Math.round(LINE.length * seg(p, 0.6, 0.69));
+          whisper.textContent = LINE.slice(0, typed); whisper.style.opacity = 1 - seg(p, 0.7, 0.75);
+          vid.style.setProperty("--r", (emerge * 105).toFixed(1) + "%");
+          vid.style.opacity = seg(p, 0.7, 0.74);
+          vid.style.filter = `brightness(${0.35 + 0.65 * emerge})`;
+          const inFilm = p > 0.68;
+          if (inFilm && !wantPlay) { wantPlay = true; const pr = vid.play(); if (pr && pr.catch) pr.catch(() => {}); }
           if (!inFilm && wantPlay && vid.muted) { wantPlay = false; vid.pause(); }
-          play.style.opacity = p < 0.45 ? 1 - seg(p, 0.3, 0.45) : 0; play.style.pointerEvents = p < 0.42 ? "auto" : "none";
-          sound.classList.toggle("on", p > 0.86 && vid.muted);
+          play.style.opacity = (p < 0.42 ? 1 - seg(p, 0.26, 0.42) : 0) * seg(time, 4.0, 5.0);
+          play.style.pointerEvents = p < 0.38 && time > 4 ? "auto" : "none";
+          sound.classList.toggle("on", p > 0.9 && vid.muted);
           requestAnimationFrame(frame);
         }
         requestAnimationFrame(frame);
 
+        // the muted part is a short preview from the reveal; sound loads the whole film from the start
+        let full = false;
         function withSound() {
-          vid.muted = false; vid.loop = false; vid.controls = true; vid.currentTime = 0;
+          if (!full) { full = true; vid.src = "./assets/film/tamagent-film-web.mp4"; vid.load(); }
+          vid.muted = false; vid.loop = false; vid.controls = true;
+          try { vid.currentTime = 0; } catch (e) {}
           const pr = vid.play(); if (pr && pr.catch) pr.catch(() => {});
         }
-        // like the reference: a round play button in the portal; it flies you through and starts the film with sound
-        play.addEventListener("click", () => {
-          const end = sec.offsetTop + sec.offsetHeight - innerHeight;
-          scrollTo({ top: end, behavior: "smooth" }); withSound();
-        });
+        play.addEventListener("click", () => { scrollTo({ top: sec.offsetTop + sec.offsetHeight - innerHeight, behavior: "smooth" }); withSound(); });
         sound.addEventListener("click", withSound);
       })();
     </script>
