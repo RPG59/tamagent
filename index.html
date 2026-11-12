@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тамагент — раунд</title>
+<style>
+@font-face{font-family:"Unbounded";src:url(../videos/tamagent/assets/fonts/unbounded-cyrillic-wght-normal.woff2) format("woff2");font-weight:200 900;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116,U+20BD}
+@font-face{font-family:"Unbounded";src:url(../videos/tamagent/assets/fonts/unbounded-latin-wght-normal.woff2) format("woff2");font-weight:200 900;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2190-2193,U+2212,U+2215}
+@font-face{font-family:"JetBrains Mono";src:url(../videos/tamagent/assets/fonts/jetbrains-mono-cyrillic-wght-normal.woff2) format("woff2");font-weight:100 800;unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116,U+20BD}
+@font-face{font-family:"JetBrains Mono";src:url(../videos/tamagent/assets/fonts/jetbrains-mono-latin-wght-normal.woff2) format("woff2");font-weight:100 800;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2190-2193,U+2212,U+2215,U+25A0-25FF,U+2713}
+:root{
+  --ink:#0C0A16;--panel:#15122A;--panel-2:#1D1838;--amber:#FFB224;--cream:#F4ECDD;--muted:#8F88A8;--alarm:#FF4B5C;
+  --line:rgba(244,236,221,.12);
+  --c-cost:#7A68D8;--c-chan:#C2607C;--c-left:#C48612;
+  --f-display:"Unbounded",sans-serif;--f-text:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--cream);font-family:var(--f-text);font-size:20px;line-height:1.5;
+  background-image:radial-gradient(1400px 900px at 70% 0%,#1E173F 0%,rgba(12,10,22,0) 70%),radial-gradient(rgba(244,236,221,.07) 1.5px,transparent 1.7px);
+  background-size:auto,48px 48px;background-repeat:no-repeat,repeat;background-attachment:scroll}
+.wrap{max-width:1560px;margin:0 auto;padding:0 80px}
+h1,h2,h3,.d{font-family:var(--f-display);font-weight:800;letter-spacing:-.02em;line-height:1.02}
+.note{color:var(--muted);font-size:17px;line-height:1.45}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:6px}
+
+/* hero */
+.hero{min-height:min(100vh,960px);display:grid;grid-template-columns:minmax(0,1fr) 560px;column-gap:64px;align-items:center;padding-top:40px;padding-bottom:56px}
+.hero h1{font-size:clamp(88px,6.9vw,132px)}
+.hero .sub{font-family:var(--f-display);font-weight:300;font-size:clamp(26px,2.1vw,38px);line-height:1.2;margin-top:18px;max-width:17em}
+.offer{margin-top:56px;padding-top:30px;border-top:2px solid var(--amber);max-width:760px}
+.offer .today{font-family:var(--f-text);font-weight:600;color:var(--amber);font-size:22px}
+.offer .deal{font-size:clamp(42px,3.5vw,66px);margin-top:10px;white-space:nowrap}
+.offer .deal span{color:var(--amber)}
+.offer p{margin-top:18px;max-width:34em}
+.offer .clock{margin-top:22px;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
+.offer .clock b{font-family:var(--f-display);font-weight:800;font-size:40px;color:var(--cream);font-variant-numeric:tabular-nums;min-width:6.2em}
+.btn{display:inline-block;margin-top:30px;font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--ink);background:var(--amber);border:0;border-radius:14px;padding:18px 34px;cursor:pointer;text-decoration:none}
+.btn:hover{background:#FFC555}
+.btn[disabled]{background:#4A4266;color:#A9A2C2;cursor:not-allowed}
+.device{position:relative;width:560px;height:620px;border-radius:28px;overflow:hidden;background:#17122E}
+.device img{position:absolute;max-width:none;display:block}
+.device .glow{mix-blend-mode:screen;opacity:.75;transition:opacity .4s}
+.device canvas{position:absolute;display:block}
+.device.party .glow{opacity:1}
+.device figcaption{position:absolute;left:22px;bottom:16px;right:22px;font-size:15px;color:rgba(244,236,221,.62)}
+
+/* round */
+section{padding:92px 0 0}
+section h2{font-size:clamp(40px,3.2vw,60px)}
+section .lead{margin-top:14px;max-width:44em;color:var(--cream)}
+.round{display:grid;grid-template-columns:minmax(0,1fr) 520px;column-gap:64px;align-items:start;margin-top:40px}
+.cap{display:grid;grid-template-columns:repeat(20,1fr);gap:6px}
+.cell{aspect-ratio:1;border-radius:5px;background:rgba(244,236,221,.07);border:1px solid rgba(244,236,221,.10)}
+.cell.sold{background:var(--amber);border-color:var(--amber);box-shadow:0 0 16px rgba(255,178,36,.45)}
+.cell.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes pop{0%{transform:scale(.2)}100%{transform:scale(1)}}
+.tally{display:flex;align-items:flex-end;justify-content:space-between;gap:36px;margin-top:30px}
+.tally .sum{font-size:clamp(44px,3.6vw,68px);white-space:nowrap}
+.tally .of{color:var(--muted);font-size:20px;margin-top:6px;white-space:nowrap}
+.tally canvas{width:260px;height:195px;flex:none;margin-bottom:-14px}
+.latest{margin-top:26px;list-style:none;border-top:1px solid var(--line)}
+.latest li{display:flex;justify-content:space-between;gap:20px;padding:12px 0;border-bottom:1px solid var(--line)}
+.latest li span:last-child{color:var(--muted);white-space:nowrap}
+.latest .empty{color:var(--muted);display:block}
+form{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:30px}
+fieldset{border:0}
+legend,label.f{display:block;font-weight:600;margin-bottom:12px}
+.shares{display:grid;gap:10px}
+.shares input{position:absolute;opacity:0;pointer-events:none}
+.shares label{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:16px 20px;border:1.5px solid rgba(244,236,221,.22);border-radius:14px;cursor:pointer}
+.shares label b{font-family:var(--f-display);font-weight:800;font-size:28px}
+.shares input:checked+label{border-color:var(--amber);background:rgba(255,178,36,.10)}
+.shares input:focus-visible+label{outline:3px solid var(--amber);outline-offset:3px}
+.shares input:disabled+label{opacity:.35;cursor:not-allowed}
+label.f{margin-top:24px}
+input[type=text]{width:100%;font:inherit;color:var(--cream);background:var(--ink);border:1.5px solid rgba(244,236,221,.22);border-radius:14px;padding:15px 18px}
+input[type=text]::placeholder{color:#6F6889}
+form .btn{width:100%;margin-top:22px}
+#status{min-height:1.5em;margin-top:16px;color:var(--amber);font-weight:600}
+#status.err{color:var(--alarm)}
+.legal{margin-top:14px;font-size:16px;line-height:1.45;color:var(--cream);opacity:.78}
+
+/* charts */
+.chart{margin-top:56px}
+.chart h3{font-size:30px}
+.chart .src{margin-top:8px}
+.split{display:flex;gap:2px;height:84px;margin-top:26px}
+.split div{border-radius:4px;min-width:0}
+.split .cost{background:var(--c-cost);flex:23}.split .chan{background:var(--c-chan);flex:15}
+.split .var{flex:20;background:repeating-linear-gradient(45deg,var(--c-chan) 0 10px,#2A2040 10px 17px)}
+.split .left{background:var(--c-left);flex:41}
+.keys{display:flex;gap:2px;margin-top:14px}
+.keys>div{min-width:0;padding-right:18px}
+.keys b{display:flex;align-items:center;gap:12px;font-family:var(--f-display);font-weight:800;font-size:33px;white-space:nowrap}
+.keys i,.rows i{display:block;width:18px;height:18px;border-radius:4px;flex:none}
+.keys span{display:block;margin-top:4px;font-size:18px;line-height:1.4}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:72px}
+.market{display:grid;grid-template-columns:330px minmax(0,1fr);column-gap:34px;margin-top:26px;align-items:start}
+.grid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(15,1fr);grid-template-columns:repeat(25,1fr);gap:2px}
+.grid div{aspect-ratio:1;border-radius:2px;background:rgba(244,236,221,.16)}
+.grid .sam{background:var(--amber)}
+.grid .som{background:#fff;box-shadow:0 0 12px #fff}
+.rows{display:grid;gap:18px}
+.rows b{display:flex;align-items:center;gap:12px;font-family:var(--f-display);font-weight:800;font-size:34px;white-space:nowrap}
+.rows span{display:block;font-size:17px;line-height:1.4;margin-top:2px}
+.plan{display:grid;grid-template-columns:repeat(3,1fr);column-gap:28px;align-items:end;height:300px;margin-top:26px;border-bottom:1px solid rgba(244,236,221,.28);padding:0 8px}
+.plan .col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.plan .val{font-family:var(--f-display);font-weight:800;font-size:26px;white-space:nowrap}
+.plan .rev{font-size:17px;color:var(--cream);margin-bottom:10px;white-space:nowrap}
+.plan .bar{width:96px;background:var(--amber);border-radius:4px 4px 0 0;min-height:4px}
+.years{display:grid;grid-template-columns:repeat(3,1fr);column-gap:28px;padding:10px 8px 0;text-align:center;font-size:18px}
+.funds{margin-top:36px;display:grid;gap:0;border-top:1px solid var(--line)}
+.funds div{display:grid;grid-template-columns:430px minmax(0,1fr);column-gap:30px;align-items:baseline;padding:20px 0;border-bottom:1px solid var(--line)}
+.funds b{font-family:var(--f-display);font-weight:800;font-size:38px;white-space:nowrap}
+footer{margin-top:96px;padding:34px 0 60px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+footer p{max-width:44em}
+[data-tip]{cursor:default}
+#tip{position:fixed;z-index:9;pointer-events:none;background:#F4ECDD;color:#0C0A16;font-size:16px;line-height:1.35;padding:8px 12px;border-radius:8px;max-width:300px;opacity:0;transform:translate(-50%,-130%);white-space:pre-line}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cell.pop{animation:none}.device .glow{transition:none}}
+</style>
+</head>
+<body>
+<div id="tip" role="tooltip"></div>
+
+<header class="wrap hero">
+  <div>
+    <h1>Тамагент</h1>
+    <p class="sub">Голос, экран и тело для вашего агента</p>
+    <div class="offer">
+      <div class="today">Только сегодня</div>
+      <div class="deal d"><span>1%</span> за 5 млн руб.</div>
+      <p>Оценка 500 млн руб. — запрос команды. Выручки пока нет, есть прототип и фильм.</p>
+      <div class="clock"><span>Предложение сгорает в полночь, осталось</span><b id="clock">--:--:--</b></div>
+      <a class="btn" href="#round">Выбрать долю</a>
+    </div>
+  </div>
+  <figure class="device" id="device">
+    <img id="plate" alt="Тамагент: рендер будущего устройства" src="../videos/tamagent/assets/plates/hero_base.jpg">
+    <img id="glow" class="glow" alt="" src="../videos/tamagent/assets/plates/hero_glow.jpg">
+    <canvas id="screen" width="800" height="600" aria-hidden="true"></canvas>
+    <figcaption>Рендер будущего устройства. Прототип работает на дев-ките ESP32-S3-BOX-3B.</figcaption>
+  </figure>
+</header>
+
+<main class="wrap">
+  <section id="round">
+    <h2>Раунд на 10%</h2>
+    <p class="lead">Одна клетка — 0,1% компании, 500 тыс. руб. Сто клеток заняты — раунд закрыт.</p>
+    <div class="round">
+      <div>
+        <div class="cap" id="cap" aria-label="Клетки раунда"></div>
+        <div class="tally">
+          <div>
+            <div class="sum d" id="sum">0 руб.</div>
+            <div class="of" id="of">собрано из 50 млн руб., занято 0% из 10%</div>
+          </div>
+          <canvas id="pet" width="400" height="300" aria-hidden="true" data-tip="Растёт на инвестициях"></canvas>
+        </div>
+        <ul class="latest" id="latest"></ul>
+      </div>
+      <form id="form" novalidate>
+        <fieldset>
+          <legend>Доля</legend>
+          <div class="shares">
+            <input type="radio" name="share" id="s1" value="1"><label for="s1"><b>0,1%</b><span>500 тыс. руб.</span></label>
+            <input type="radio" name="share" id="s5" value="5"><label for="s5"><b>0,5%</b><span>2,5 млн руб.</span></label>
+            <input type="radio" name="share" id="s10" value="10" checked><label for="s10"><b>1%</b><span>5 млн руб.</span></label>
+          </div>
+        </fieldset>
+        <label class="f" for="who">Имя или ник</label>
+        <input type="text" id="who" maxlength="24" autocomplete="off" placeholder="как вас записать">
+        <button class="btn" type="submit" id="go">Инвестировать</button>
+        <div id="status" role="status" aria-live="polite"></div>
+        <p class="legal">Хакатон-демо. Денег не списываем, это не оферта и не предложение ценных бумаг.</p>
+      </form>
+    </div>
+  </section>
+
+  <section id="numbers">
+    <h2>Цифры за оценкой</h2>
+    <div class="chart">
+      <h3>Из чего складываются $99 за устройство</h3>
+      <p class="note src">Оценка команды на партию 10 000 штук. Котировок завода пока нет.</p>
+      <div class="split" role="img" aria-label="Цена 99 долларов: около 23 себестоимость, 15–35 канал продаж, 41–61 остаётся">
+        <div class="cost" data-tip="около $23&#10;детали, сборка, оснастка, сертификация, доставка и пошлина"></div>
+        <div class="chan" data-tip="$15&#10;онлайн-канал берёт около 15%"></div>
+        <div class="var" data-tip="ещё до $20&#10;розница берёт до 35%"></div>
+        <div class="left" data-tip="$41–61&#10;остаётся на софт, модели и поддержку"></div>
+      </div>
+      <div class="keys">
+        <div style="flex:23"><b><i style="background:var(--c-cost)"></i>около $23</b><span>себестоимость с доставкой и пошлиной</span></div>
+        <div style="flex:35"><b><i style="background:var(--c-chan)"></i>$15–35</b><span>канал продаж: 15% онлайн, до 35% в рознице (штриховка)</span></div>
+        <div style="flex:41"><b><i style="background:var(--c-left)"></i>$41–61</b><span>остаётся на софт, модели и поддержку</span></div>
+      </div>
+    </div>
+
+    <div class="two">
+      <div class="chart">
+        <h3>Рынок: 36,5 млн разработчиков</h3>
+        <p class="note src">SlashData, 2025. Stack Overflow, май 2026, n около 1100. Цена $99 — оценка команды. Одна клетка — 100 тыс. разработчиков.</p>
+        <div class="market">
+          <div class="grid" id="grid" role="img" aria-label="365 клеток: 135 — работают с агентами каждый день, одна — цель на три года"></div>
+          <div class="rows">
+            <div><b><i style="background:rgba(244,236,221,.3)"></i>$3,6 млрд</b><span>весь рынок: 36,5 млн разработчиков × $99</span></div>
+            <div><b><i style="background:var(--amber)"></i>$1,34 млрд</b><span>37% работают с агентами каждый день: 13,5 млн × $99</span></div>
+            <div><b><i style="background:#fff"></i>$13,4 млн</b><span>наша цель: 1% из них за три года, 135 тыс. устройств</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="chart">
+        <h3>План на три года: 135 тыс. устройств</h3>
+        <p class="note src">План команды. Выручка — устройства × $99, вместе $13,4 млн.</p>
+        <div class="plan" role="img" aria-label="Устройств в год: 1 тысяча, 24 тысячи, 110 тысяч">
+          <div class="col" data-tip="Год 1, пилот&#10;1 000 устройств, $99 тыс."><div class="val">1 тыс.</div><div class="rev">$99 тыс.</div><div class="bar" style="height:0.9%"></div></div>
+          <div class="col" data-tip="Год 2&#10;24 000 устройств, $2,38 млн"><div class="val">24 тыс.</div><div class="rev">$2,38 млн</div><div class="bar" style="height:15.3%"></div></div>
+          <div class="col" data-tip="Год 3&#10;110 000 устройств, $10,89 млн"><div class="val">110 тыс.</div><div class="rev">$10,89 млн</div><div class="bar" style="height:70%"></div></div>
+        </div>
+        <div class="years"><span>год 1, пилот</span><span>год 2</span><span>год 3</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="funds">
+    <h2>На что пойдут деньги</h2>
+    <div class="funds">
+      <div><b>около $31 тыс.</b><span>разово: форма корпуса, сертификация, доводка платы на заводе. Оценка команды.</span></div>
+      <div><b>около $60 тыс.</b><span>первая тысяча устройств для пилота, по $60 за штуку. Оценка команды.</span></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Команда: Hustler, Hacker, Hipster.</p>
+    <p class="legal" style="margin-top:0">Хакатон-демо. Денег не списываем, это не оферта и не предложение ценных бумаг.</p>
+  </footer>
+</main>
+
+<script src="../videos/tamagent/assets/plan.js"></script>
+<script src="../videos/tamagent/assets/tama.js"></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const CAP = 100, UNIT = 500000, KEY = "tamagent-round-v1";           // 100 cells of 0.1% = the 10% round
+  const q = new URLSearchParams(location.search), demo = q.get("demo");
+  const calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- state: pledges live in localStorage; the page works without it; ?demo runs stay in memory ---- */
+  let pledges = [];
+  function load() { try { const v = JSON.parse(localStorage.getItem(KEY) || "[]"); if (Array.isArray(v)) pledges = v.filter((p) => p && typeof p.who === "string" && [1, 5, 10].includes(p.n)); } catch (e) { pledges = []; } }
+  function save() { if (demo) return; try { localStorage.setItem(KEY, JSON.stringify(pledges)); } catch (e) {} }
+  function reset() { pledges = []; try { localStorage.removeItem(KEY); } catch (e) {} say("Раунд сброшен"); draw(); }
+  if (q.get("reset")) { try { localStorage.removeItem(KEY); } catch (e) {} } else if (!demo) load();
+  const taken = () => pledges.reduce((a, p) => a + p.n, 0);
+
+  /* ---- formatting ---- */
+  const pct = (n) => String(n / 10).replace(".", ",") + "%";
+  function rub(n) { const v = n * UNIT; return v === 0 ? "0 руб." : v < 1e6 ? (v / 1e3) + " тыс. руб." : String(v / 1e6).replace(".", ",") + " млн руб."; }
+
+  /* ---- the round ---- */
+  const cap = $("cap"), cells = [];
+  for (let i = 0; i < CAP; i++) { const c = document.createElement("div"); c.className = "cell"; cap.appendChild(c); cells.push(c); }
+  let partyUntil = 0, lastCount = 0;
+  function say(text, err) { const s = $("status"); s.textContent = text; s.className = err ? "err" : ""; }
+  function draw(fresh) {
+    const t = taken(); let i = 0;
+    pledges.forEach((p) => { for (let k = 0; k < p.n; k++, i++) { const c = cells[i]; c.className = "cell sold" + (fresh && i >= lastCount ? " pop" : ""); c.dataset.tip = p.who + "\n" + pct(p.n) + " за " + rub(p.n); } });
+    for (; i < CAP; i++) { cells[i].className = "cell"; cells[i].dataset.tip = "Свободно\n0,1% за 500 тыс. руб."; }
+    lastCount = t;
+    $("sum").textContent = rub(t);
+    $("of").textContent = t >= CAP ? "раунд закрыт: 10% за 50 млн руб." : "собрано из 50 млн руб., занято " + pct(t) + " из 10%";
+    const ul = $("latest"); ul.textContent = "";
+    if (!pledges.length) { const li = document.createElement("li"), s = document.createElement("span"); s.className = "empty"; s.textContent = "Пока никто не вложился. Первая клетка — ваша."; li.appendChild(s); ul.appendChild(li); }
+    pledges.slice(-5).reverse().forEach((p) => { const li = document.createElement("li"), a = document.createElement("span"), b = document.createElement("span"); a.textContent = p.who; b.textContent = pct(p.n) + " за " + rub(p.n); li.appendChild(a); li.appendChild(b); ul.appendChild(li); });
+    const left = CAP - t;
+    [["s1", 1], ["s5", 5], ["s10", 10]].forEach(([id, n]) => { const el = $(id); el.disabled = n > left; if (el.disabled && el.checked) el.checked = false; });
+    if (left > 0 && !document.querySelector('input[name=share]:checked')) { const first = [$("s10"), $("s5"), $("s1")].find((e) => !e.disabled); if (first) first.checked = true; }
+    $("go").disabled = left <= 0; $("who").disabled = left <= 0;
+    if (left <= 0) say("Раунд закрыт: 10% за 50 млн руб. Спасибо!");
+  }
+  function pledge(who, n) {
+    who = (who || "").trim().slice(0, 24);
+    if (!who) { say("Впишите имя или ник — так мы запишем долю", true); $("who").focus(); return false; }
+    if (n > CAP - taken()) { say("Столько уже не осталось, выберите долю меньше", true); return false; }
+    pledges.push({ who, n, ts: Date.now() }); save();
+    say("Инвестиция записана: " + who + ", " + pct(n) + " за " + rub(n));
+    partyUntil = performance.now() + 3600; $("device").classList.add("party");
+    draw(true); return true;
+  }
+  $("form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const pick = document.querySelector('input[name=share]:checked');
+    if (!pick) { say("Выберите долю", true); return; }
+    if (pledge($("who").value, Number(pick.value))) $("who").value = "";
+  });
+  // rehearsal reset: Shift+Alt+R (or open the page with ?reset=1)
+  document.addEventListener("keydown", (e) => { if (e.shiftKey && e.altKey && e.code === "KeyR") { e.preventDefault(); reset(); } });
+
+  /* ---- countdown to local midnight ---- */
+  function tick() {
+    const now = new Date(), end = new Date(now); end.setHours(24, 0, 0, 0);
+    const s = Math.max(0, Math.floor((end - now) / 1000)), p = (x) => String(x).padStart(2, "0");
+    $("clock").textContent = p(Math.floor(s / 3600)) + ":" + p(Math.floor(s % 3600 / 60)) + ":" + p(s % 60);
+  }
+  tick(); setInterval(tick, 1000);
+
+  /* ---- device picture: crop the render around the device and put a live screen on its glass ---- */
+  const P = (window.PLATES && window.PLATES.hero) || { w: 3840, h: 2160, screens: [{ x: 1693.4, y: 945.3, w: 453.2, h: 339.9, r: 11.3 }] };
+  const s0 = P.screens[0], box = $("device"), k = 560 / 1240, cx = s0.x + s0.w / 2, cy = s0.y + s0.h / 2 + 40;
+  const ox = cx - 620, oy = cy - 620 * (620 / 560);
+  ["plate", "glow"].forEach((id) => { const im = $(id); im.style.width = P.w * k + "px"; im.style.left = -ox * k + "px"; im.style.top = -oy * k + "px"; im.addEventListener("error", () => { im.style.display = "none"; }); });
+  const scr = $("screen"); scr.style.left = (s0.x - ox) * k + "px"; scr.style.top = (s0.y - oy) * k + "px"; scr.style.width = s0.w * k + "px"; scr.style.height = s0.h * k + "px"; scr.style.borderRadius = (s0.r || 0) * k + "px";
+
+  /* ---- the creature: idle, celebrates a pledge, grows with the round ---- */
+  function frame(ms) {
+    const T = window.Tama; if (!T) return;                               // no tama.js: the page still reads
+    const party = ms < partyUntil, closed = taken() >= CAP, t = calm ? 0.4 : ms / 1000;
+    if (!party) box.classList.remove("party");
+    const state = party || closed ? "happy" : "idle", stage = taken() >= 66 ? 3 : taken() >= 33 ? 2 : 1;
+    try {
+      T.drawScreen(scr, { state, stage: 1, zoom: 2, t });
+      T.drawScreen($("pet"), { bare: true, state, stage, baseY: 24, t });
+    } catch (e) { return; }
+    if (!calm) requestAnimationFrame(frame);
+  }
+  if (window.Tama) { requestAnimationFrame(frame); if (calm) setInterval(() => frame(performance.now()), 600); }
+  else { scr.style.display = "none"; $("pet").style.display = "none"; }
+
+  /* ---- market grid: 365 cells, column by column; the first nine columns are the daily-agent share ---- */
+  const grid = $("grid");
+  for (let i = 0; i < 365; i++) { const d = document.createElement("div"); if (i === 14) { d.className = "som"; d.dataset.tip = "Наша цель на три года\n135 тыс. устройств, $13,4 млн"; } else if (i < 135) { d.className = "sam"; d.dataset.tip = "Работают с агентами каждый день\n13,5 млн разработчиков, $1,34 млрд"; } else d.dataset.tip = "Все профессиональные разработчики\n36,5 млн, $3,6 млрд"; grid.appendChild(d); }
+
+  /* ---- one tooltip for every mark ---- */
+  const tip = $("tip");
+  document.addEventListener("mousemove", (e) => {
+    const el = e.target.closest && e.target.closest("[data-tip]");
+    if (!el) { tip.style.opacity = 0; return; }
+    tip.textContent = el.dataset.tip; tip.style.left = e.clientX + "px"; tip.style.top = e.clientY + "px"; tip.style.opacity = 1;
+  });
+
+  draw();
+  /* ---- scripted runs for checks: ?demo=1 makes two pledges, ?demo=cap fills the round; nothing is stored ---- */
+  if (demo === "1") { pledge("Аня", 5); pledge("Борис", 10); }
+  if (demo === "cap") { const names = ["Аня", "Борис", "Вера", "Глеб", "Дина", "Егор", "Жанна", "Зоя", "Илья", "Кира", "Лев"]; let i = 0; while (taken() < CAP) pledge(names[i++ % names.length], Math.min(10, CAP - taken() >= 10 ? 10 : CAP - taken() >= 5 ? 5 : 1)); }
+  if (demo) { document.documentElement.dataset.taken = taken(); partyUntil = 0; }
+})();
+</script>
+</body>
+</html>
