@@ -665,71 +665,132 @@
         margin-top: 12px;
       }
 
-      /* ---- first screen: a black hole you scroll through into the film (after violoop.ai) ---- */
-      #film { position: relative; height: 420vh; padding: 0; }
-      #film .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: #050409; }
-      #film canvas.bh { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 2.4s ease 0.4s; }
-      #film.lit canvas.bh { opacity: 1; }
-      #film .bh-css { position: absolute; inset: 0; display: none;
+      /* ---- first screen: the device in front of a black hole; one button drops it in and the film opens on the other side ---- */
+      /* Without the script (or if it fails) this is a plain film player: the rules below it only apply once #film has .js. */
+      #film { position: relative; padding: 0; --bar: 72px; --egg: min(34vw, 460px, 46svh); }
+      #film .stage { position: relative; background: #050409; overflow: hidden; }
+      #film .stage:focus { outline: none; }
+      #film .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; height: var(--bar);
+        padding: 0 28px; font-size: 13px; letter-spacing: .28em; color: rgba(244,236,221,.7); }
+      #film .bar nav { display: flex; align-items: center; gap: 10px; }
+      #film .bar a, #film .close { font-family: var(--f-text); font-size: 14px; letter-spacing: .12em; line-height: 1; white-space: nowrap;
+        padding: 9px 14px; border-radius: 999px; text-decoration: none; cursor: pointer; background: none; }
+      #film .bar a { color: var(--amber); border: 1px solid rgba(255,178,36,.5); }
+      #film .bar a:hover { background: rgba(255,178,36,.14); }
+      #film .close { color: var(--cream); border: 1px solid rgba(244,236,221,.6); }
+      #film .close:hover { background: rgba(244,236,221,.14); }
+      #film video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; }
+      #film canvas.bh, #film .bh-css, #film .egg, #film .front, #film .close, #film .acts, #film .end { display: none; }
+
+      #film.js .stage { height: 100vh; height: 100svh; }
+      #film.js canvas.bh { display: block; position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 2.4s ease 0.4s; }
+      #film.js.lit canvas.bh { opacity: 1; }
+      #film.js.flat canvas.bh { display: none; }
+      #film.js.flat .bh-css { display: block; position: absolute; inset: 0;
         background: radial-gradient(circle at 50% 50%, #000 0 14%, rgba(255,178,36,.75) 15%, rgba(142,123,224,.35) 22%, rgba(7,6,14,0) 42%); }
-      #film .bar { position: absolute; left: 0; right: 0; top: 0; z-index: 6; display: flex; justify-content: space-between; align-items: center;
-        padding: 20px 28px; font-size: 13px; letter-spacing: .28em; color: rgba(244,236,221,.7); opacity: 0; transition: opacity 1.2s ease 3.2s; }
-      #film.lit .bar { opacity: 1; }
-      #film .bar a { color: var(--amber); text-decoration: none; letter-spacing: .12em; font-size: 14px; border: 1px solid rgba(255,178,36,.5); padding: 8px 14px; border-radius: 999px; }
-      #film .egg { position: absolute; left: 50%; top: 52%; width: min(34vw, 460px); aspect-ratio: 1 / 1;
-        transform: translate(-50%, -50%); will-change: transform, opacity, filter; }
+      #film.js .bar { position: absolute; left: 0; right: 0; top: 0; z-index: 6; opacity: 0; transition: opacity .8s ease .5s; }
+      #film.js.lit .bar { opacity: 1; }
+      #film.js .egg { display: block; position: absolute; left: 50%; top: 50%; width: var(--egg); aspect-ratio: 1 / 1;
+        transform: translate(-50%, -50%); will-change: transform, opacity, filter; cursor: pointer; }
       #film .egg-in { position: absolute; inset: 0; animation: drift 6s ease-in-out infinite;
         background: url(./assets/plates/hero_base.jpg) 50% 61% / 340% auto no-repeat;
         -webkit-mask: radial-gradient(closest-side, #000 62%, transparent 100%); mask: radial-gradient(closest-side, #000 62%, transparent 100%);
-        filter: brightness(0) contrast(1.2); transition: filter 2.6s ease 1.6s; }
+        filter: brightness(0) contrast(1.2); transition: filter 2.6s ease 1.2s; }
       #film.lit .egg-in { filter: brightness(1) contrast(1); }
       @keyframes drift { 0%, 100% { transform: translateY(-1.2%); } 50% { transform: translateY(1.2%); } }
-      #film .tag { position: absolute; max-width: 260px; opacity: 0; transform: translateY(8px); }
-      #film .tag b { display: block; font-family: var(--f-text); font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--cream); }
-      #film .tag span { display: block; margin-top: 4px; font-size: 13px; line-height: 1.4; color: rgba(244,236,221,.7); }
-      #film .tag i { display: inline-block; padding: 8px 12px; border-radius: 6px; background: rgba(12,10,22,.7); backdrop-filter: blur(3px); font-style: normal; }
-      #film .head { position: absolute; left: 0; right: 0; top: 12vh; text-align: center; pointer-events: none; padding: 0 20px; }
+
+      /* everything that belongs to the closed portal: headline, the four notes, the button, the cue to the round */
+      #film.js .front { display: block; position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+      #film .front > * { pointer-events: auto; }
+      #film .head { position: absolute; left: 0; right: 0; top: max(var(--bar), calc(50% - var(--egg) * .5 - clamp(58px, 7.2vw, 118px))); text-align: center; pointer-events: none; padding: 0 20px; }
       #film .head .t { font-size: clamp(34px, 5vw, 84px); color: var(--cream); }
       #film .head .t span { display: inline-block; opacity: 0; filter: blur(14px); transform: translateY(14px); transition: opacity 1.4s ease, filter 1.6s ease, transform 1.6s ease; }
+      #film .head .t span:nth-child(2) { transition-delay: .18s; }
+      #film .head .t span:nth-child(3) { transition-delay: .36s; }
       #film.lit .head .t span { opacity: 1; filter: blur(0); transform: none; }
-      #film .head p { margin-top: 14px; color: rgba(244,236,221,.6); font-size: 15px; letter-spacing: .32em; opacity: 0; transition: opacity 1.2s ease 4.2s; }
-      #film.lit .head p { opacity: 1; animation: breathe 2.8s ease-in-out 5.4s infinite; }
-      @keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
-      #film .px { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; background: var(--amber);
-        box-shadow: 0 0 26px 6px rgba(255,178,36,.55); opacity: 0; }
-      #film .whisper { position: absolute; left: 0; right: 0; top: calc(50% + 34px); text-align: center; font-size: 15px; letter-spacing: .4em; color: rgba(244,236,221,.75); white-space: nowrap; }
-      #film video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; opacity: 0;
+      #film .tag { position: absolute; max-width: 260px; opacity: 0; transform: translateY(8px); transition: opacity .9s ease, transform .9s ease; pointer-events: none; }
+      #film.lit .tag { opacity: 1; transform: none; }
+      #film .tag:nth-of-type(2) { transition-delay: 2.6s; }
+      #film .tag:nth-of-type(3) { transition-delay: 2.8s; }
+      #film .tag:nth-of-type(4) { transition-delay: 3s; }
+      #film .tag:nth-of-type(5) { transition-delay: 3.2s; }
+      #film .tag b { display: block; font-family: var(--f-text); font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--cream); }
+      #film .tag span { display: block; margin-top: 4px; font-size: 13px; line-height: 1.4; color: rgba(244,236,221,.82); }
+      #film .tag i { display: inline-block; padding: 8px 12px; border-radius: 6px; background: rgba(12,10,22,.7); backdrop-filter: blur(3px); font-style: normal; }
+      #film .cta { position: absolute; left: 0; right: 0; top: calc(50% + var(--egg) * .48); text-align: center; pointer-events: none;
+        opacity: 0; transform: translateY(10px); transition: opacity .9s ease 1.9s, transform .9s ease 1.9s; }
+      #film.lit .cta { opacity: 1; transform: none; }
+      #film .play { pointer-events: auto; display: inline-flex; align-items: center; gap: 14px; cursor: pointer; border: 0; border-radius: 999px;
+        padding: 17px 30px 17px 26px; font-family: var(--f-display); font-weight: 800; font-size: 20px; letter-spacing: -.01em;
+        color: var(--ink); background: var(--amber); box-shadow: 0 0 44px rgba(255,178,36,.38); transition: transform .2s, background-color .2s; }
+      #film .play::before { content: ""; border-style: solid; border-width: 9px 0 9px 15px; border-color: transparent transparent transparent currentColor; }
+      #film .play:hover { background: #ffc555; transform: scale(1.04); }
+      #film .play:active { transform: scale(.98); }
+      #film .cta small { display: table; margin: 12px auto 0; padding: 6px 12px; border-radius: 999px; background: rgba(12,10,22,.72); backdrop-filter: blur(3px);
+        font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: rgba(244,236,221,.78); }
+      #film .down { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); padding: 6px 10px; white-space: nowrap;
+        font-size: 13px; letter-spacing: .22em; text-transform: uppercase; text-decoration: none; color: rgba(244,236,221,.55);
+        opacity: 0; transition: opacity .9s ease 2.6s, color .2s; }
+      #film.lit .down { opacity: 1; }
+      #film .down:hover { color: var(--amber); }
+
+      /* the film: below the bar, never cropped; the mask is the iris that opens it */
+      #film.js video { position: absolute; left: 50%; top: calc(var(--bar) + (100% - var(--bar)) / 2); z-index: 3; transform: translate(-50%, -50%);
+        width: min(100%, calc((100vh - var(--bar)) * 16 / 9)); width: min(100%, calc((100svh - var(--bar)) * 16 / 9)); height: auto;
+        visibility: hidden; outline-offset: -3px;
         -webkit-mask: radial-gradient(circle at 50% 50%, #000 var(--r, 0%), transparent calc(var(--r, 0%) + 18%)); mask: radial-gradient(circle at 50% 50%, #000 var(--r, 0%), transparent calc(var(--r, 0%) + 18%)); }
-      #film .play { position: absolute; left: 50%; top: 52%; z-index: 5; width: 72px; height: 72px; margin: -36px 0 0 -36px;
-        display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer;
-        border: 1.5px solid rgba(255,178,36,.75); background: rgba(12,10,22,.55); color: var(--amber);
-        box-shadow: 0 0 32px rgba(255,178,36,.3); backdrop-filter: blur(8px); opacity: 0;
-        transition: transform .3s, background-color .3s, color .3s; }
-      #film .play:hover { transform: scale(1.06); background: var(--amber); color: var(--ink); }
-      #film .play::before { content: ""; margin-left: 4px; border-style: solid; border-width: 11px 0 11px 17px; border-color: transparent transparent transparent currentColor; }
-      #film .play span { position: absolute; top: 86px; white-space: nowrap; font-size: 12px; letter-spacing: .28em; color: rgba(255,178,36,.85); }
-      #film .sound { position: absolute; right: 24px; bottom: 24px; z-index: 6; opacity: 0; pointer-events: none;
-        font-family: var(--f-text); font-size: 16px; padding: 12px 20px; border-radius: 999px; cursor: pointer;
-        border: 1.5px solid var(--amber); background: rgba(12,10,22,.7); color: var(--amber); transition: opacity .4s; }
-      #film .sound.on { opacity: 1; pointer-events: auto; }
-      #film .kicker { display: none; }
-      @media (max-width: 760px) {
-        #film { height: 380vh; }
-        #film .bar { padding: 14px 16px; font-size: 11px; letter-spacing: .2em; }
-        #film .bar a { font-size: 12px; padding: 7px 11px; }
-        #film .head { top: 13vh; }
-        #film .egg { width: min(70vw, 360px); top: 54%; }
-        #film .play { top: 54%; }
+      #film.js.open video { -webkit-mask: none; mask: none; }
+      #film.js[data-state="film"] .close { display: inline-block; }
+      #film.js .acts { display: flex; position: absolute; z-index: 5; right: 24px; top: calc(var(--bar) + 16px); gap: 10px; visibility: hidden; }
+      #film.js.open .acts { visibility: visible; }
+      #film.js.ended .acts { visibility: hidden; }
+      #film .acts button { font-family: var(--f-text); font-size: 15px; line-height: 1; padding: 13px 18px; border-radius: 999px; cursor: pointer;
+        border: 1.5px solid var(--amber); background: rgba(12,10,22,.82); color: var(--amber); }
+      #film .acts button:hover { background: var(--amber); color: var(--ink); }
+      #film .acts .full { display: none; }
+      #film .acts [hidden] { display: none !important; }
+      #film.js .end { position: absolute; left: 0; right: 0; top: var(--bar); bottom: 0; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 6px; padding: 24px; text-align: center; background: rgba(5,4,9,.86); backdrop-filter: blur(6px); }
+      #film.js .end[hidden] { display: none; }
+      #film .end .today { font-weight: 600; color: var(--amber); font-size: 18px; }
+      #film .end .deal { font-size: clamp(26px, 4.4vw, 68px); white-space: nowrap; }
+      #film .end .deal span { color: var(--amber); }
+      #film .end .btn { margin-top: 26px; }
+      #film .end .again { margin-top: 14px; min-height: 44px; font-family: var(--f-text); font-size: 15px; color: var(--cream); background: none;
+        border: 1px solid rgba(244,236,221,.4); border-radius: 999px; padding: 0 22px; cursor: pointer; }
+      #film .end .again:hover { background: rgba(244,236,221,.14); }
+
+      @media (max-height: 620px) {
         #film .tag { display: none; }
-        #film video { object-fit: contain; }
-        #film .whisper { font-size: 12px; letter-spacing: .3em; }
-        #film .sound { left: 16px; right: 16px; bottom: 16px; }
+      }
+      @media (orientation: portrait) { /* upright tablets and phones: the device carries the screen, the four notes go */
+        #film { --egg: min(70vw, 460px, 46svh); }
+        #film .tag { display: none; }
+      }
+      @media (max-width: 760px) {
+        #film { --bar: 56px; --egg: min(70vw, 360px, 46svh); }
+        #film .bar { padding: 0 16px; font-size: 11px; letter-spacing: .2em; }
+        #film .bar a, #film .close { font-size: 12px; padding: 13px 12px; }
+        #film .close { width: 44px; height: 44px; padding: 0; text-align: center; font-size: 15px; }
+        #film .end .deal { font-size: 7vw; }
+        #film .close span { display: none; }
+        #film .play { font-size: 18px; padding: 16px 26px 16px 22px; }
+        #film .cta small { font-size: 12px; }
+        #film.js .acts { left: 16px; right: 16px; flex-direction: column; top: calc(var(--bar) + (100vh - var(--bar)) / 2 + 28.125vw + 20px); top: calc(var(--bar) + (100svh - var(--bar)) / 2 + 28.125vw + 20px); }
+        #film .acts button { width: 100%; padding: 15px 18px; }
+      }
+      @media (max-width: 760px) and (orientation: portrait) {
+        #film .acts .full { display: block; }
+      }
+      @media (max-height: 480px) { /* a phone on its side */
+        #film { --bar: 52px; --egg: min(34vw, 40svh); }
+        #film .head .t { font-size: 30px; }
+        #film .play { font-size: 17px; padding: 13px 24px 13px 20px; }
+        #film .cta small { margin-top: 8px; }
+        #film .down { display: none; } /* no room; the round is one tap away in the bar */
       }
       @media (prefers-reduced-motion: reduce) {
-        #film { height: auto; }
-        #film .stage { position: relative; height: auto; aspect-ratio: 16 / 9; }
-        #film canvas.bh, #film .egg, #film .tag, #film .head, #film .play, #film .kicker, #film .px, #film .whisper { display: none; }
-        #film video { position: relative; opacity: 1; -webkit-mask: none; mask: none; }
+        #film * { transition: none !important; animation: none !important; }
       }
 
       /* ---- phones and narrow windows ---- */
@@ -783,28 +844,47 @@
     <div id="tip" role="tooltip"></div>
 
     <section id="film" aria-label="Тамагент: первый экран и фильм">
+      <script>document.currentScript.parentNode.classList.add("js");</script>
       <div class="stage">
         <canvas class="bh" aria-hidden="true"></canvas>
         <div class="bh-css" aria-hidden="true"></div>
-        <div class="bar"><span>ТАМАГЕНТ</span><a href="#round">1% за 5 млн руб. →</a></div>
-        <div class="head"><div class="t d" role="heading" aria-level="2"><span>Он</span> <span>уже</span> <span>рядом</span></div><p>листайте вниз</p></div>
+        <div class="bar">
+          <span>ТАМАГЕНТ</span>
+          <nav aria-label="Первый экран">
+            <a href="#round">1% за 5 млн руб. →</a>
+            <button class="close" type="button" aria-label="Закрыть фильм"><span>Закрыть </span>✕</button>
+          </nav>
+        </div>
         <div class="egg" aria-hidden="true"><div class="egg-in"></div></div>
-        <div class="tag" style="left:7%;top:26%"><i><b>Голос в обе стороны</b><span>Спрашивает вслух, вы отвечаете вслух.</span></i></div>
-        <div class="tag" style="right:6%;top:24%;text-align:right"><i><b>Любой агент</b><span>Claude Code, Codex, OpenCode и другие.</span></i></div>
-        <div class="tag" style="left:9%;top:72%"><i><b>Зовёт, когда нужен</b><span>Светом, звуком и голосом.</span></i></div>
-        <div class="tag" style="right:7%;top:74%;text-align:right"><i><b>Растёт на задачах</b><span>Персонаж, о котором не забывают.</span></i></div>
-        <div class="px" aria-hidden="true"></div>
-        <div class="whisper" aria-hidden="true"></div>
-        <video preload="metadata" playsinline muted loop poster="./assets/film/tamagent-film-poster.jpg">
-          <source src="./assets/film/tamagent-preview.mp4" type="video/mp4" />
+        <div class="front">
+          <div class="head"><div class="t d" role="heading" aria-level="2"><span>Он</span> <span>уже</span> <span>рядом</span></div></div>
+          <div class="tag" style="left:7%;top:26%"><i><b>Голос в обе стороны</b><span>Спрашивает вслух, вы отвечаете вслух.</span></i></div>
+          <div class="tag" style="right:6%;top:24%;text-align:right"><i><b>Любой агент</b><span>Claude Code, Codex, OpenCode и другие.</span></i></div>
+          <div class="tag" style="left:9%;top:72%"><i><b>Зовёт, когда нужен</b><span>Светом, звуком и голосом.</span></i></div>
+          <div class="tag" style="right:7%;top:74%;text-align:right"><i><b>Растёт на задачах</b><span>Персонаж, о котором не забывают.</span></i></div>
+          <div class="cta">
+            <button class="play" type="button"><span class="lbl">Смотреть фильм</span></button>
+            <small>2:47 · со звуком</small>
+          </div>
+          <a class="down" href="#offer">Раунд ниже ↓</a>
+        </div>
+        <video controls playsinline preload="metadata" poster="./assets/film/tamagent-film-poster.jpg" aria-label="Фильм о Тамагенте, 2 минуты 47 секунд">
+          <source src="./assets/film/tamagent-film-web.mp4" type="video/mp4" />
         </video>
-        <button class="play" type="button" aria-label="Смотреть фильм со звуком"><span>СМОТРЕТЬ</span></button>
-        <button class="sound" type="button">Смотреть со звуком</button>
-        <span class="kicker">// ПО ТУ СТОРОНУ</span>
+        <div class="acts">
+          <button class="unmute" type="button" hidden>Включить звук</button>
+          <button class="full" type="button">На весь экран</button>
+        </div>
+        <div class="end" hidden>
+          <div class="today">Только сегодня</div>
+          <div class="deal d"><span>1%</span> за 5 млн руб.</div>
+          <a class="btn" href="#round">Выбрать долю</a>
+          <button class="again" type="button">Смотреть ещё раз</button>
+        </div>
       </div>
     </section>
 
-    <header class="wrap hero">
+    <header class="wrap hero" id="offer">
       <div>
         <h1>Тамагент</h1>
         <p class="sub">Голос, экран и тело для вашего агента</p>
@@ -1405,102 +1485,183 @@
       })();
     </script>
     <script>
-      /* ---- first screen: the device in front of a black hole; scrolling drops it in and the film opens on the other side ---- */
+      /* ---- first screen: the device in front of a black hole. One button drops it in and the film opens on the other side.
+         Two states, "portal" and "film"; the passage between them runs on a clock, the page itself scrolls normally. ---- */
       (function () {
-        const sec = document.getElementById("film"); if (!sec) return;
-        const cv = sec.querySelector("canvas.bh"), egg = sec.querySelector(".egg"), vid = sec.querySelector("video");
-        const tags = [...sec.querySelectorAll(".tag")], head = sec.querySelector(".head"), play = sec.querySelector(".play"), sound = sec.querySelector(".sound");
-        const px = sec.querySelector(".px"), whisper = sec.querySelector(".whisper"), bar = sec.querySelector(".bar");
-        const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), seg = (x, a, b) => clamp((x - a) / (b - a), 0, 1), ease = (x) => x * x * (3 - 2 * x);
-        if (reduce) { vid.controls = true; vid.muted = false; vid.loop = false; vid.style.opacity = 1; return; }
-        requestAnimationFrame(() => setTimeout(() => sec.classList.add("lit"), 250)); // darkness first, then the disk ignites, then the device
+        const sec = document.getElementById("film"); if (!sec || !sec.classList.contains("js")) return;
+        const $ = (s) => sec.querySelector(s);
+        const stage = $(".stage"), cv = $("canvas.bh"), flat = $(".bh-css"), egg = $(".egg"), front = $(".front"), vid = $("video");
+        const play = $(".play"), lbl = $(".play .lbl"), meta = $(".cta small"), closeB = $(".close"), unmute = $(".unmute"), fullB = $(".full"), end = $(".end");
+        const poster = vid.getAttribute("poster");
+        try {
+          const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+          const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), seg = (x, a, b) => clamp((x - a) / (b - a), 0, 1), ease = (x) => x * x * (3 - 2 * x);
+          const OPEN_MS = 2000, CLOSE_MS = 650;
+          vid.controls = false; vid.removeAttribute("poster"); // the film opens from black, so no poster behind the iris
+          if (reduce) sec.classList.add("lit"); else requestAnimationFrame(() => setTimeout(() => sec.classList.add("lit"), 250)); // darkness first, then the disk ignites, then the device
 
-        let gl = null, uni = {}, t0 = performance.now();
-        try { gl = cv.getContext("webgl", { antialias: false, premultipliedAlpha: false }); } catch (e) { gl = null; }
-        if (gl) {
-          const vs = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
-          const fs = `precision mediump float;
-            uniform vec2 u_res; uniform float u_time; uniform float u_rs; uniform float u_glow;
-            float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-            float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
-            float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*noise(p);p*=2.03;a*=.5;}return v;}
-            void main(){
-              vec2 uv=(gl_FragCoord.xy-.5*u_res)/min(u_res.x,u_res.y); float r=length(uv), ang=atan(uv.y,uv.x);
-              float rs=u_rs, dr=r/rs;
-              vec2 luv=uv*(1.+rs*rs/max(r*r,1e-4)*.35);
-              float band=smoothstep(1.05,1.35,dr)*(1.-smoothstep(1.6,3.2,dr));
-              vec2 ring2=vec2(cos(ang-u_time*.35),sin(ang-u_time*.35))*2.6;
-              float streaks=fbm(vec2(dr*9.-u_time*.7,0.)+ring2);
-              float doppler=1.+.9*clamp(-sin(ang+.6),0.,1.);
-              float disk=band*(.3+1.15*streaks)*doppler*u_glow;
-              float ring=exp(-abs(dr-1.18)*28.)*1.5*(.25+.75*u_glow);
-              vec2 sp=floor(luv*150.); float star=step(.9975,hash(sp))*(.4+.6*noise(vec2(u_time*.7)+sp));
-              vec3 amber=vec3(1.,.70,.14), violet=vec3(.55,.48,.88), hot=vec3(1.,.95,.86);
-              vec3 col=disk*mix(violet,amber,clamp(streaks*1.3-.1,0.,1.));
-              col+=ring*mix(amber,hot,.5); col+=star*vec3(.9,.86,1.)*.75;
-              col*=smoothstep(.98,1.02,dr);
-              gl_FragColor=vec4(col,1.);
-            }`;
-          const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
-          try {
-            const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pr); gl.useProgram(pr);
-            const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-            const loc = gl.getAttribLocation(pr, "a"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-            uni = { res: gl.getUniformLocation(pr, "u_res"), time: gl.getUniformLocation(pr, "u_time"), rs: gl.getUniformLocation(pr, "u_rs"), glow: gl.getUniformLocation(pr, "u_glow") };
-          } catch (e) { gl = null; }
-        }
-        if (!gl) { cv.style.display = "none"; sec.querySelector(".bh-css").style.display = "block"; }
+          let gl = null, uni = {};
+          const t0 = performance.now();
+          try { gl = cv.getContext("webgl", { antialias: false, premultipliedAlpha: false }); } catch (e) { gl = null; }
+          if (gl) {
+            const vs = "attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}";
+            const fs = `precision mediump float;
+              uniform vec2 u_res; uniform float u_time; uniform float u_rs; uniform float u_glow;
+              float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+              float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
+              float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*noise(p);p*=2.03;a*=.5;}return v;}
+              void main(){
+                vec2 uv=(gl_FragCoord.xy-.5*u_res)/min(u_res.x,u_res.y); float r=length(uv), ang=atan(uv.y,uv.x);
+                float rs=u_rs, dr=r/rs;
+                vec2 luv=uv*(1.+rs*rs/max(r*r,1e-4)*.35);
+                float band=smoothstep(1.05,1.35,dr)*(1.-smoothstep(1.6,3.2,dr));
+                vec2 ring2=vec2(cos(ang-u_time*.35),sin(ang-u_time*.35))*2.6;
+                float streaks=fbm(vec2(dr*9.-u_time*.7,0.)+ring2);
+                float doppler=1.+.9*clamp(-sin(ang+.6),0.,1.);
+                float disk=band*(.3+1.15*streaks)*doppler*u_glow;
+                float ring=exp(-abs(dr-1.18)*28.)*1.5*(.25+.75*u_glow);
+                vec2 sp=floor(luv*150.); float star=step(.9975,hash(sp))*(.4+.6*noise(vec2(u_time*.7)+sp));
+                vec3 amber=vec3(1.,.70,.14), violet=vec3(.55,.48,.88), hot=vec3(1.,.95,.86);
+                vec3 col=disk*mix(violet,amber,clamp(streaks*1.3-.1,0.,1.));
+                col+=ring*mix(amber,hot,.5); col+=star*vec3(.9,.86,1.)*.75;
+                col*=smoothstep(.98,1.02,dr);
+                gl_FragColor=vec4(col,1.);
+              }`;
+            const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+            try {
+              const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pr); gl.useProgram(pr);
+              const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+              const loc = gl.getAttribLocation(pr, "a"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+              uni = { res: gl.getUniformLocation(pr, "u_res"), time: gl.getUniformLocation(pr, "u_time"), rs: gl.getUniformLocation(pr, "u_rs"), glow: gl.getUniformLocation(pr, "u_glow") };
+            } catch (e) { gl = null; }
+          }
+          if (!gl) sec.classList.add("flat"); // no WebGL: a still gradient stands in for the disk
+          cv.addEventListener("webglcontextlost", () => { gl = null; sec.classList.add("flat"); });
 
-        function size() { const k = Math.min(devicePixelRatio || 1, 1.5); cv.width = Math.round(cv.clientWidth * k); cv.height = Math.round(cv.clientHeight * k); if (gl) gl.viewport(0, 0, cv.width, cv.height); }
-        addEventListener("resize", size); size();
-        const progress = () => { const r = sec.getBoundingClientRect(), span = sec.offsetHeight - innerHeight; return clamp(-r.top / span, 0, 1); };
-        const LINE = "по ту сторону";
-        let wantPlay = false, ignite = 0;
-        function frame(now) {
-          const p = progress(), time = (now - t0) / 1000;
-          ignite = ease(clamp((time - 0.6) / 2.6, 0, 1)); // the disk lights up slowly after load
-          // horizon radius, in units of the shorter side of the screen
-          const grow = ease(seg(p, 0.1, 0.45)), swallow = ease(seg(p, 0.42, 0.6));
-          const rs = 0.14 + 0.2 * grow + 2.6 * swallow;
-          if (gl) { gl.uniform2f(uni.res, cv.width, cv.height); gl.uniform1f(uni.time, time); gl.uniform1f(uni.rs, rs); gl.uniform1f(uni.glow, ignite); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); }
-          // the device falls in: smaller, turning, dimming, blurring
-          const fall = ease(seg(p, 0.16, 0.46));
-          egg.style.opacity = 1 - seg(p, 0.4, 0.47);
-          egg.style.transform = `translate(-50%, -50%) scale(${1 - 0.93 * fall}) rotate(${-16 * fall}deg)`;
-          egg.style.filter = fall > 0 ? `blur(${7 * fall}px) brightness(${1 - 0.6 * fall})` : "";
-          tags.forEach((el, i) => { const a = ease(seg(p, 0.03 + i * 0.025, 0.08 + i * 0.025)) * (1 - seg(p, 0.26, 0.34)); el.style.opacity = a; el.style.transform = `translateY(${(1 - a) * 8}px)`; });
-          head.style.opacity = 1 - seg(p, 0.12, 0.24);
-          bar.style.visibility = p > 0.55 ? "hidden" : "visible";
-          // the other side: total darkness, one amber pixel, a whisper; then the film surfaces from the black
-          const dark = seg(p, 0.58, 0.62), emerge = ease(seg(p, 0.7, 0.92));
-          const beat = 0.55 + 0.45 * Math.sin(time * 4.2);
-          px.style.opacity = dark * (1 - seg(p, 0.7, 0.76)) * beat;
-          const typed = Math.round(LINE.length * seg(p, 0.6, 0.69));
-          whisper.textContent = LINE.slice(0, typed); whisper.style.opacity = 1 - seg(p, 0.7, 0.75);
-          vid.style.setProperty("--r", (emerge * 105).toFixed(1) + "%");
-          vid.style.opacity = seg(p, 0.7, 0.74);
-          vid.style.filter = `brightness(${0.35 + 0.65 * emerge})`;
-          const inFilm = p > 0.68;
-          if (inFilm && !wantPlay) { wantPlay = true; const pr = vid.play(); if (pr && pr.catch) pr.catch(() => {}); }
-          if (!inFilm && wantPlay && vid.muted) { wantPlay = false; vid.pause(); }
-          play.style.opacity = (p < 0.42 ? 1 - seg(p, 0.26, 0.42) : 0) * seg(time, 4.0, 5.0);
-          play.style.pointerEvents = p < 0.38 && time > 4 ? "auto" : "none";
-          sound.classList.toggle("on", p > 0.9 && vid.muted);
-          requestAnimationFrame(frame);
-        }
-        requestAnimationFrame(frame);
+          // p runs 0 → 1 from the closed portal to the open film: the notes fade, the device falls in, the horizon swallows the screen, the film irises out of the black
+          let state = "portal", p = 0, target = 0, last = 0, running = false, visible = true;
+          function draw(time) {
+            const swallow = ease(seg(p, 0.34, 0.7));
+            if (gl) {
+              const rs = 0.14 + 0.2 * ease(seg(p, 0.04, 0.5)) + 2.6 * swallow; // horizon radius, in units of the shorter side of the screen
+              gl.uniform2f(uni.res, cv.width, cv.height); gl.uniform1f(uni.time, reduce ? 8 : time); gl.uniform1f(uni.rs, rs);
+              gl.uniform1f(uni.glow, reduce ? 1 : ease(clamp((time - 0.6) / 2.6, 0, 1))); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            } else flat.style.opacity = 1 - swallow;
+            const fall = ease(seg(p, 0.04, 0.52));
+            egg.style.opacity = 1 - seg(p, 0.44, 0.52);
+            egg.style.visibility = p < 0.52 ? "visible" : "hidden";
+            egg.style.transform = `translate(-50%, -50%) scale(${1 - 0.93 * fall}) rotate(${-16 * fall}deg)`;
+            egg.style.filter = fall > 0 ? `blur(${7 * fall}px) brightness(${1 - 0.6 * fall})` : "";
+            const f = 1 - seg(p, 0, 0.12);
+            front.style.opacity = f; front.style.visibility = f > 0 ? "visible" : "hidden";
+            const emerge = ease(seg(p, 0.62, 1));
+            vid.style.setProperty("--r", (emerge * 105).toFixed(1) + "%");
+            vid.style.visibility = p > 0.6 ? "visible" : "hidden";
+            vid.style.filter = emerge < 1 ? `brightness(${0.35 + 0.65 * emerge})` : "";
+            sec.classList.toggle("open", p >= 1);
+          }
+          function tick(now) {
+            const dt = Math.min(now - last, 200), moving = p !== target; last = now;
+            if (moving && (reduce || !visible)) p = target; // nothing to animate for: reduced motion, or the first screen is out of sight
+            else if (moving) {
+              const d = dt / (target > p ? OPEN_MS : CLOSE_MS);
+              p = target > p ? Math.min(target, p + d) : Math.max(target, p - d);
+            }
+            draw((now - t0) / 1000);
+            if (moving && p === target) settled();
+            // the shader only runs while the portal is on screen: not behind the open film, not below the fold
+            if (!reduce && visible && !(state === "film" && p === 1)) requestAnimationFrame(tick); else running = false;
+          }
+          function kick() { if (running) return; running = true; last = performance.now(); requestAnimationFrame(tick); }
+          let refocus = false;
+          function settled() {
+            if (state === "film") { vid.controls = true; stage.focus({ preventScroll: true }); }
+            else if (refocus) { refocus = false; play.focus({ preventScroll: true }); }
+          }
 
-        // the muted part is a short preview from the reveal; sound loads the whole film from the start
-        let full = false;
-        function withSound() {
-          if (!full) { full = true; vid.src = "./assets/film/tamagent-film-web.mp4"; vid.load(); }
-          vid.muted = false; vid.loop = false; vid.controls = true;
-          try { vid.currentTime = 0; } catch (e) {}
-          const pr = vid.play(); if (pr && pr.catch) pr.catch(() => {});
+          const clock = (s) => { s = Math.round(s); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+          const atEnd = () => vid.ended || (vid.duration > 0 && vid.currentTime > vid.duration - 0.4);
+          function label() {
+            const resume = vid.currentTime > 1 && !atEnd();
+            lbl.textContent = resume ? "Продолжить фильм" : "Смотреть фильм";
+            meta.textContent = (resume ? "с " + clock(vid.currentTime) : clock(vid.duration || 167)) + " · со звуком";
+          }
+          function showEnd(on) { end.hidden = !on; sec.classList.toggle("ended", on); }
+          function start() {
+            const pr = vid.play();
+            if (pr && pr.catch) pr.catch((err) => {
+              if (err && err.name === "AbortError") return; // closed or scrolled away before the first frame
+              vid.muted = true; unmute.hidden = false;      // the browser refused sound: play silent and offer it
+              const again = vid.play(); if (again && again.catch) again.catch(() => {});
+            });
+          }
+          function open() {
+            if (state === "film") return;
+            state = "film"; sec.dataset.state = "film"; target = 1;
+            showEnd(false);
+            if (atEnd()) { try { vid.currentTime = 0; } catch (e) {} }
+            vid.muted = false; unmute.hidden = true;
+            start(); // inside the click, so sound is allowed; the film's own opening is black, the iris meets it there
+            const top = sec.getBoundingClientRect().top;
+            if (Math.abs(top) > 2) scrollTo({ top: scrollY + top, behavior: reduce ? "auto" : "smooth" });
+            kick();
+          }
+          function close(byUser) {
+            if (state !== "film") return;
+            state = "portal"; sec.dataset.state = "portal"; target = 0; refocus = !!byUser;
+            vid.pause(); vid.controls = false; showEnd(false); label();
+            kick();
+          }
+
+          play.addEventListener("click", open);
+          egg.addEventListener("click", open);
+          document.querySelectorAll('a[href="#film"]').forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); open(); }));
+          const warm = () => { vid.preload = "auto"; }; // start buffering as soon as the button is aimed at
+          play.addEventListener("pointerenter", warm); play.addEventListener("focus", warm); play.addEventListener("touchstart", warm, { passive: true });
+          closeB.addEventListener("click", () => close(true));
+          document.addEventListener("keydown", (e) => { if (e.key === "Escape" && state === "film" && !document.fullscreenElement) close(true); });
+          // Space pauses and resumes. A focused <video> has its own, browser-specific idea of Space (Chrome resumes on key-up),
+          // so the press is taken here and focus moves to the stage before the key comes back up.
+          stage.tabIndex = -1;
+          stage.addEventListener("keydown", (e) => {
+            if (state !== "film" || p < 1 || (e.key !== " " && e.key !== "k") || e.target.closest("button, a")) return;
+            e.preventDefault(); if (e.target === vid) stage.focus({ preventScroll: true });
+            if (e.repeat) return; if (vid.paused) start(); else vid.pause();
+          });
+          unmute.addEventListener("click", () => { vid.muted = false; unmute.hidden = true; start(); });
+          vid.addEventListener("volumechange", () => { if (!vid.muted) unmute.hidden = true; });
+          if (!vid.requestFullscreen && !vid.webkitEnterFullscreen) fullB.hidden = true;
+          fullB.addEventListener("click", () => {
+            if (vid.requestFullscreen) {
+              const pr = vid.requestFullscreen();
+              if (pr && pr.then) pr.then(() => { const o = screen.orientation; if (o && o.lock) o.lock("landscape").catch(() => {}); }).catch(() => {});
+            } else vid.webkitEnterFullscreen();
+          });
+          vid.addEventListener("ended", () => {
+            if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            else if (vid.webkitDisplayingFullscreen && vid.webkitExitFullscreen) vid.webkitExitFullscreen();
+            if (state === "film") showEnd(true);
+          });
+          vid.addEventListener("playing", () => showEnd(false));
+          $(".again").addEventListener("click", () => { try { vid.currentTime = 0; } catch (e) {} showEnd(false); start(); stage.focus({ preventScroll: true }); });
+          $(".end .btn").addEventListener("click", () => close(false)); // the link itself scrolls to the round
+
+          // leave the first screen and the film stops with it; nothing keeps playing out of sight
+          let ratio = 1;
+          new IntersectionObserver((es) => {
+            const r = es[es.length - 1].intersectionRatio;
+            if (state === "film" && r < 0.5 && r < ratio && !vid.paused && !document.fullscreenElement) vid.pause();
+            ratio = r; visible = r > 0; if (visible) kick();
+          }, { threshold: [0, 0.25, 0.5, 0.75, 1] }).observe(stage);
+
+          function size() { const k = Math.min(devicePixelRatio || 1, 1.5); cv.width = Math.round(cv.clientWidth * k); cv.height = Math.round(cv.clientHeight * k); if (gl) gl.viewport(0, 0, cv.width, cv.height); if (running) return; draw((performance.now() - t0) / 1000); }
+          addEventListener("resize", size); size();
+          kick();
+        } catch (e) {
+          // anything above failed: fall back to the plain player the markup already is
+          sec.classList.remove("js"); vid.controls = true; vid.removeAttribute("style"); if (poster) vid.setAttribute("poster", poster);
+          console.warn("film portal off:", e);
         }
-        play.addEventListener("click", () => { scrollTo({ top: sec.offsetTop + sec.offsetHeight - innerHeight, behavior: "smooth" }); withSound(); });
-        sound.addEventListener("click", withSound);
       })();
     </script>
   </body>
