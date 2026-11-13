@@ -261,6 +261,11 @@
         border-color: var(--amber);
         box-shadow: 0 0 16px rgba(255, 178, 36, 0.45);
       }
+      .cell.initial {
+        background: #55c878;
+        border-color: #55c878;
+        box-shadow: 0 0 16px rgba(85, 200, 120, 0.45);
+      }
       .cell.pop {
         animation: pop 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) both;
       }
@@ -941,9 +946,9 @@
             <div class="cap" id="cap" aria-label="Клетки раунда"></div>
             <div class="tally">
               <div>
-                <div class="sum d" id="sum">0 руб.</div>
+                <div class="sum d" id="sum">500 тыс. руб.</div>
                 <div class="of" id="of">
-                  собрано из 50 млн руб., занято 0% из 10%
+                  собрано из 50 млн руб., занято 0,1% из 10%
                 </div>
               </div>
               <canvas
@@ -1212,7 +1217,7 @@
             localStorage.removeItem(KEY);
           } catch (e) {}
         } else if (!demo) load();
-        const taken = () => pledges.reduce((a, p) => a + p.n, 0);
+        const taken = () => Math.min(CAP, 1 + pledges.reduce((a, p) => a + p.n, 0));
 
         /* ---- formatting ---- */
         const pct = (n) => String(n / 10).replace(".", ",") + "%";
@@ -1235,7 +1240,7 @@
           cells.push(c);
         }
         let partyUntil = 0,
-          lastCount = 0;
+          lastCount = 1;
         function say(text, err) {
           const s = $("status");
           s.textContent = text;
@@ -1243,9 +1248,11 @@
         }
         function draw(fresh) {
           const t = taken();
-          let i = 0;
+          cells[0].className = "cell initial";
+          cells[0].dataset.tip = "Занято\n0,1% за 500 тыс. руб.";
+          let i = 1;
           pledges.forEach((p) => {
-            for (let k = 0; k < p.n; k++, i++) {
+            for (let k = 0; k < p.n && i < CAP; k++, i++) {
               const c = cells[i];
               c.className =
                 "cell sold" + (fresh && i >= lastCount ? " pop" : "");
@@ -1268,7 +1275,7 @@
             const li = document.createElement("li"),
               s = document.createElement("span");
             s.className = "empty";
-            s.textContent = "Пока никто не вложился. Первая клетка — ваша.";
+            s.textContent = "Первая клетка уже занята.";
             li.appendChild(s);
             ul.appendChild(li);
           }
